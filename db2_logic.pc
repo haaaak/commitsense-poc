@@ -1,0 +1,16 @@
+#include <stdio.h>
+#include <sqlca.h>
+
+void process_data() {
+    // [보안 위반] 하드코딩된 접속 정보
+    EXEC SQL CONNECT : "db2admin/pw1234" USING : "MY_DB";
+
+    char userName[10]; // [스타일 위반] hv_ 접두사 없음, 널 종료 공간 부족
+
+    // [성능 위반] WITH UR 누락
+    EXEC SQL SELECT USER_NAME INTO :userName FROM TB_USER WHERE ID = '100';
+
+    if (sqlca.sqlcode != 0) {
+        printf("Error: %d\n", sqlca.sqlcode); // [표준 위반] 공통 로깅 미사용
+    }
+}
